@@ -16,7 +16,7 @@ namespace UpdateSQL
 
         static void Main(string[] args)
         {
-            string documentum_i_chronicle_id = string.Empty, documentum_r_object_id = string.Empty, i_chronicle_id = string.Empty, a_webc_url = string.Empty, title = string.Empty,
+            string documentum_i_chronicle_id = string.Empty, documentum_r_object_id = string.Empty, i_chronicle_id = string.Empty, a_webc_url = string.Empty, title = string.Empty, display_order = string.Empty,
             r_object_id = string.Empty, content_id = string.Empty, r_folder_path = string.Empty, i_full_format = string.Empty, r_object_type = string.Empty;
             log4net.GlobalContext.Properties[Constants.R_OBJECT_ID] = string.Empty;
             try
@@ -62,7 +62,8 @@ namespace UpdateSQL
                         {
                             a_webc_url = Convert.ToString(dataRow["a_webc_url"]);
                             title = dataRow["title"].ToString();
-                            InsertDB(sqlConnection, r_object_id, content_id, r_object_type, r_folder_path, i_full_format, a_webc_url, title, documentum_r_object_id, i_chronicle_id);
+                            display_order = !string.IsNullOrEmpty(dataRow["display_order"].ToString()) ? dataRow["display_order"].ToString() : "0";
+                            InsertDB(sqlConnection, r_object_id, content_id, r_object_type, r_folder_path, i_full_format, a_webc_url, title, documentum_r_object_id, i_chronicle_id, display_order);
                         }
                         else
                             log.Info($"For the given for documentum_r_object_id : {documentum_r_object_id}, content not available in sql r_object_id : {r_object_id}, i_chronicle_id : {i_chronicle_id}, content_id : {content_id}, r_folder_path : {r_folder_path}");
@@ -193,13 +194,13 @@ namespace UpdateSQL
             }
         }
 
-        public static void InsertDB(SqlConnection sqlConnection, string r_object_id, string content_id, string r_object_type, string r_folder_path, string i_full_format, string a_webc_url, string title, string documentum_r_object_id, string i_chronicle_id)
+        public static void InsertDB(SqlConnection sqlConnection, string r_object_id, string content_id, string r_object_type, string r_folder_path, string i_full_format, string a_webc_url, string title, string documentum_r_object_id, string i_chronicle_id, string display_order)
         {
             string query = string.Empty;
             try
             {
-                query = "INSERT INTO dbo.ahfc_s_table_Migration (r_object_id, i_chronicle_id, content_id, r_object_type, r_folder_path,  i_full_format,a_webc_url,title,object_name)";
-                query += " VALUES (@r_object_id, @i_chronicle_id, @content_id, @r_object_type, @r_folder_path, @i_full_format,@a_webc_url,@title,@object_name)";
+                query = "INSERT INTO dbo.ahfc_s_table_Migration (r_object_id, i_chronicle_id, content_id, r_object_type, r_folder_path,  i_full_format,a_webc_url,title,object_name,display_order)";
+                query += " VALUES (@r_object_id, @i_chronicle_id, @content_id, @r_object_type, @r_folder_path, @i_full_format,@a_webc_url,@title,@object_name,@display_order)";
 
                 using (SqlCommand command = sqlConnection.CreateCommand())
                 {
@@ -213,6 +214,7 @@ namespace UpdateSQL
                     command.Parameters.AddWithValue(Constants.SP_A_WEBC_URL, a_webc_url);
                     command.Parameters.AddWithValue(Constants.SP_TITLE, title);
                     command.Parameters.AddWithValue(Constants.SP_OBJECT_NAME, title);
+                    command.Parameters.AddWithValue(Constants.SP_DISPLAY_ORDER, display_order);
                     command.ExecuteNonQuery();
                     log.Debug($"Inserted SQL data successfully for documentum_r_object_id  : {documentum_r_object_id}, r_object_id : {r_object_id}, i_chronicle_id : {i_chronicle_id}, content_id : {content_id}, r_folder_path : {r_folder_path}");
                 }

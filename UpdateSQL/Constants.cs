@@ -32,6 +32,7 @@ namespace UpdateSQL
         public const string SP_A_WEBC_URL = "@a_webc_url";
         public const string SP_TITLE = "@title";
         public const string SP_OBJECT_NAME = "@object_name";
+        public const string SP_DISPLAY_ORDER = "@display_order";
 
         //used in where condition
         public const string SP_R_OBJECT_TYPE = "@r_object_type";
